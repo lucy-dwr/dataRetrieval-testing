@@ -85,8 +85,8 @@ knitr::kable(available_data, format = "pipe")
 Looking at this dataframe of available data, it appears that water
 temperature data are not available for the period of interest (water
 year 2022-2023). To confirm that I have not excluded important parameter
-codes or have otherwise interpreted information incorrectly, I viewed
-the [station
+codes or otherwise interpreted information incorrectly, I viewed the
+[station
 information](https://waterdata.usgs.gov/nwis/inventory/?site_no=04086600&agency_cd=USGS&)
 in the NWIS graphical user web interface. The NWIS web interface page
 for this site confirms that only discharge, chloride, suspended sediment
