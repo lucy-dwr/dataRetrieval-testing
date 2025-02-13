@@ -1,5 +1,2 @@
-*.md linguist-language=R
-*.qmd linguist-language=R
-
 *.css linguist-detectable=false
 *.js linguist-detectable=false
