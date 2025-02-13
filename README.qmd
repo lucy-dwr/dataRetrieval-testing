@@ -1,6 +1,6 @@
 ---
 title: "`dataRetrieval` user package testing"
-format: html
+format: gfm
 ---
 
 ## Introduction
@@ -68,8 +68,7 @@ available_data <- available_data |>
   dplyr::filter(parm_cd %in% parameter_codes$parameter_code) |>
   dplyr::left_join(parameter_codes, by = c("parm_cd" = "parameter_code"))
 
-knitr::kable(available_data) |>
-  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+knitr::kable(available_data, format = "pipe")
 ```
 
 Looking at this dataframe of available data, it appears that water temperature 
@@ -90,10 +89,9 @@ observations are available for the study period.
 Next, I pulled daily mean discharge in cubic feet per second using the 
 `readNWISdv()` function and the appropriate parameter code. To be extra sure 
 that I'm not accidentally missing water temperature data, I also attempted to 
-pull water temperature data with the appropriate parameter code. As expected, 
-the resultant water temperature dataframe was empty. I could have combined these
-pulls, but to be clear for the purposes of this analysis, I pulled each 
-parameter of interest separately.
+pull water temperature data with the appropriate parameter code. I could have
+combined the flow and temperature pulls, but to be clear for the purposes of
+this analysis, I pulled each parameter of interest separately.
 
 ```{r pull_data, message = FALSE}
 flow_parameter_code <- "00060" # daily mean discharge in cfs
@@ -114,9 +112,14 @@ temp <- dataRetrieval::readNWISdv(
 )
 ```
 
+Let's view the flow data pull results first:
+
 ```{r check_flow_results}
 dplyr::glimpse(flow)
 ```
+
+Next, let's view the water temperature data pull results. As expected, the water
+temperature dataframe was empty.
 
 ```{r check_temp_results}
 dplyr::glimpse(temp)
@@ -146,7 +149,7 @@ Lastly, I visualized the data, as the prompt requested. I decided against
 "visualizing" the empty water temperature data with an empty plot for the sake
 of time, though that's certainly possible to do.
 
-```{r visualize, out.width = "100%"}
+```{r visualize, out.width = "100%", dpi = 700}
 # In this script I have defaulted to fully qualifying function calls for
 # clarity, but that's annoying with ggplot2 syntax, so let's load ggplot2
 
