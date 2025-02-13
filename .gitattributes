@@ -1,2 +1,5 @@
 *.md linguist-detectable
 *.qmd linguist-detectable
+
+*.css linguist-detectable=false
+*.js linguist-detectable=false
