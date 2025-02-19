@@ -10,13 +10,13 @@ This script is part of user testing for the United States Geological Survey
 user testing, users are asked to conduct an analysis that addresses this prompt:
 
 _You are working on an annual report of discharge and water temperature at the_ 
-_Milwaukee River near Cedarburg, Wisconsin, site #USGS-04086600. Your tasks_
+_Milwaukee River near Cedarburg, Wisconsin, site #USGS-05340500. Your tasks_
 _are: a) download the daily data for stream discharge and water temperature_
 _between Oct 1, 2022 and Sept 30, 2023; b) create time-series plots of the_
 _data, one for each variable._
 
 ```{r set_up}
-site <- "04086600"
+site <- "05340500"
 
 start_date <- lubridate::as_date(x = "2022-10-01")
 end_date <- lubridate::as_date(x = "2023-09-30")
@@ -71,25 +71,17 @@ available_data <- available_data |>
 knitr::kable(available_data, format = "pipe")
 ```
 
-Looking at this dataframe of available data, it appears that water temperature 
-data are not available for the period of interest (water year 2022-2023). To 
-confirm that I have not excluded important parameter codes or otherwise 
-interpreted information incorrectly, I viewed the 
-[station information](https://waterdata.usgs.gov/nwis/inventory/?site_no=04086600&agency_cd=USGS&amp;) 
-in the NWIS graphical user web interface. The NWIS web interface page for this 
-site confirms that only discharge, chloride, suspended sediment concentration, 
-suspended sediment discharge, and phosphorus are currently sampled daily; water 
-temperature sampling has occurred as part of a discrete sampling program, but no 
-observations are available for the study period.
+Looking at this dataframe of available data, it appears that mean daily water 
+temperature and discharge data are available. Since I plan on using the function 
+`readNWISdv()`, which assumes the statistic code "00003," I don't feel the need
+to look more specifically at statistic codes.
 
 
 
 ## Data pull
 
 Next, I pulled daily mean discharge in cubic feet per second using the 
-`readNWISdv()` function and the appropriate parameter code. To be extra sure 
-that I'm not accidentally missing water temperature data, I also attempted to 
-pull water temperature data with the appropriate parameter code. I could have
+`readNWISdv()` function and the appropriate parameter codes. I could have
 combined the flow and temperature pulls, but to be clear for the purposes of
 this analysis, I pulled each parameter of interest separately.
 
@@ -118,8 +110,7 @@ Let's view the flow data pull results first:
 dplyr::glimpse(flow)
 ```
 
-Next, let's view the water temperature data pull results. As expected, the water
-temperature dataframe was empty.
+Next, let's view the water temperature data pull results.
 
 ```{r check_temp_results}
 dplyr::glimpse(temp)
@@ -132,7 +123,7 @@ dplyr::glimpse(temp)
 The data don't need much in the way of cleaning, but let's fix column names for
 clarity.
 
-```{r}
+```{r clean}
 flow <- flow |>
   dplyr::rename(
     agency_code = agency_cd,
@@ -140,14 +131,20 @@ flow <- flow |>
     flow_cfs = X_00060_00003,
     qual_code = X_00060_00003_cd
   )
+
+temp <- temp |>
+  dplyr::rename(
+    agency_code = agency_cd,
+    date = Date,
+    temp_c = X_00010_00003,
+    qual_code = X_00010_00003_cd
+  )
 ```
 
 
 ## Visualization
 
-Lastly, I visualized the data, as the prompt requested. I decided against 
-"visualizing" the empty water temperature data with an empty plot for the sake
-of time, though that's certainly possible to do.
+Lastly, I visualized the data as time series, as the prompt requested.
 
 ```{r visualize, out.width = "100%", dpi = 700}
 # In this script I have defaulted to fully qualifying function calls for
@@ -178,4 +175,26 @@ ggplot(data = flow) +
     axis.title.y = element_text(face = "bold", margin = margin(r = 10))
   )
 
+ggplot(data = temp) +
+  geom_line(aes(x = date, y = temp_c)) +
+  scale_x_date(
+    name = "Date",
+    minor_breaks = "1 month",
+    date_labels = "%b %Y"
+  ) +
+  scale_y_continuous(
+    name = "Mean daily water temperature (°C)",
+    breaks = scales::pretty_breaks(n = 10)
+  ) +
+  labs(
+    title = glue::glue("Mean water temperature: USGS site #{site}"),
+    subtitle = "Water year 2022-2023"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", margin = margin(b = 7.5)),
+    plot.subtitle = element_text(face = "italic", margin = margin(b = 10)),
+    axis.title.x = element_text(face = "bold", margin = margin(t = 10)),
+    axis.title.y = element_text(face = "bold", margin = margin(r = 10))
+  )
 ```

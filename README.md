@@ -10,12 +10,12 @@ that addresses this prompt:
 
 *You are working on an annual report of discharge and water temperature
 at the* *Milwaukee River near Cedarburg, Wisconsin, site
-\#USGS-04086600. Your tasks* *are: a) download the daily data for stream
+\#USGS-05340500. Your tasks* *are: a) download the daily data for stream
 discharge and water temperature* *between Oct 1, 2022 and Sept 30, 2023;
 b) create time-series plots of the* *data, one for each variable.*
 
 ``` r
-site <- "04086600"
+site <- "05340500"
 
 start_date <- lubridate::as_date(x = "2022-10-01")
 end_date <- lubridate::as_date(x = "2023-09-30")
@@ -70,40 +70,34 @@ knitr::kable(available_data, format = "pipe")
 
 | site_no | data_type_cd | parm_cd | stat_cd | begin_date | end_date | count_nu | description |
 |:---|:---|:---|:---|:---|:---|---:|:---|
-| 04086600 | dv | 00060 | 00003 | 1981-11-01 | 2025-02-11 | 15809 | Discharge, cubic feet per second, mean, 1 day |
-| 04086600 | qw | 00010 | NA | 2007-09-18 | 2019-09-06 | 9 | Temperature, water, degrees Celsius |
-| 04086600 | qw | 00010 | NA | 2008-07-23 | 2009-09-04 | 2 | Temperature, water, degrees Celsius |
-| 04086600 | qw | 00010 | NA | 1981-11-18 | 2018-06-12 | 90 | Temperature, water, degrees Celsius |
-| 04086600 | qw | 00060 | NA | 1993-09-14 | 2008-12-22 | 13 | Discharge, cubic feet per second, mean, 1 day |
-| 04086600 | qw | 00061 | NA | 2007-09-18 | 2013-08-19 | 4 | Discharge, instantaneous, cubic feet per second |
-| 04086600 | qw | 00061 | NA | 1981-11-18 | 2009-07-21 | 200 | Discharge, instantaneous, cubic feet per second |
-| 04086600 | qw | 30208 | NA | 1993-09-14 | 2008-12-22 | 13 | Discharge, cubic meters per second, mean, 1 day |
-| 04086600 | qw | 30209 | NA | 2007-09-18 | 2013-08-19 | 4 | Discharge, instantaneous, cubic meters per second |
-| 04086600 | qw | 30209 | NA | 1981-11-18 | 2009-07-21 | 200 | Discharge, instantaneous, cubic meters per second |
-| 04086600 | uv | 00060 | NA | 1986-10-01 | 2025-02-12 | 14014 | Discharge, cubic feet per second, mean, 1 day |
+| 05340500 | dv | 00010 | 00001 | 2000-01-21 | 2025-02-18 | 8648 | Temperature, water, degrees Celsius |
+| 05340500 | dv | 00010 | 00002 | 2000-01-21 | 2025-02-18 | 8648 | Temperature, water, degrees Celsius |
+| 05340500 | dv | 00010 | 00003 | 2000-01-21 | 2025-02-18 | 8747 | Temperature, water, degrees Celsius |
+| 05340500 | dv | 00060 | 00003 | 1902-01-01 | 2025-02-18 | 43317 | Discharge, cubic feet per second, mean, 1 day |
+| 05340500 | qw | 00010 | NA | 1968-06-03 | 1968-06-03 | 1 | Temperature, water, degrees Celsius |
+| 05340500 | qw | 00010 | NA | 1966-11-06 | 2003-10-16 | 280 | Temperature, water, degrees Celsius |
+| 05340500 | qw | 00060 | NA | 1966-11-06 | 1968-06-03 | 3 | Discharge, cubic feet per second, mean, 1 day |
+| 05340500 | qw | 00060 | NA | 1966-11-06 | 1999-02-12 | 32 | Discharge, cubic feet per second, mean, 1 day |
+| 05340500 | qw | 00061 | NA | 1974-10-02 | 2003-10-16 | 279 | Discharge, instantaneous, cubic feet per second |
+| 05340500 | qw | 30208 | NA | 1966-11-06 | 1968-06-03 | 3 | Discharge, cubic meters per second, mean, 1 day |
+| 05340500 | qw | 30208 | NA | 1966-11-06 | 1999-02-12 | 32 | Discharge, cubic meters per second, mean, 1 day |
+| 05340500 | qw | 30209 | NA | 1974-10-02 | 2003-10-16 | 279 | Discharge, instantaneous, cubic meters per second |
+| 05340500 | uv | 00010 | NA | 2007-10-01 | 2025-02-19 | 6351 | Temperature, water, degrees Celsius |
+| 05340500 | uv | 00060 | NA | 1982-10-05 | 2025-02-19 | 15478 | Discharge, cubic feet per second, mean, 1 day |
 
-Looking at this dataframe of available data, it appears that water
-temperature data are not available for the period of interest (water
-year 2022-2023). To confirm that I have not excluded important parameter
-codes or otherwise interpreted information incorrectly, I viewed the
-[station
-information](https://waterdata.usgs.gov/nwis/inventory/?site_no=04086600&agency_cd=USGS&)
-in the NWIS graphical user web interface. The NWIS web interface page
-for this site confirms that only discharge, chloride, suspended sediment
-concentration, suspended sediment discharge, and phosphorus are
-currently sampled daily; water temperature sampling has occurred as part
-of a discrete sampling program, but no observations are available for
-the study period.
+Looking at this dataframe of available data, it appears that mean daily
+water temperature and discharge data are available. Since I plan on
+using the function `readNWISdv()`, which assumes the statistic code
+“00003,” I don’t feel the need to look more specifically at statistic
+codes.
 
 ## Data pull
 
 Next, I pulled daily mean discharge in cubic feet per second using the
-`readNWISdv()` function and the appropriate parameter code. To be extra
-sure that I’m not accidentally missing water temperature data, I also
-attempted to pull water temperature data with the appropriate parameter
-code. I could have combined the flow and temperature pulls, but to be
-clear for the purposes of this analysis, I pulled each parameter of
-interest separately.
+`readNWISdv()` function and the appropriate parameter codes. I could
+have combined the flow and temperature pulls, but to be clear for the
+purposes of this analysis, I pulled each parameter of interest
+separately.
 
 ``` r
 flow_parameter_code <- "00060" # daily mean discharge in cfs
@@ -133,24 +127,24 @@ dplyr::glimpse(flow)
     Rows: 365
     Columns: 5
     $ agency_cd        <chr> "USGS", "USGS", "USGS", "USGS", "USGS", "USGS", "USGS…
-    $ site_no          <chr> "04086600", "04086600", "04086600", "04086600", "0408…
+    $ site_no          <chr> "05340500", "05340500", "05340500", "05340500", "0534…
     $ Date             <date> 2022-10-01, 2022-10-02, 2022-10-03, 2022-10-04, 2022…
-    $ X_00060_00003    <dbl> 228, 217, 204, 196, 191, 187, 177, 174, 168, 166, 167…
+    $ X_00060_00003    <dbl> 2090, 1970, 2070, 2100, 2110, 2060, 1970, 1940, 1940,…
     $ X_00060_00003_cd <chr> "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A"…
 
-Next, let’s view the water temperature data pull results. As expected,
-the water temperature dataframe was empty.
+Next, let’s view the water temperature data pull results.
 
 ``` r
 dplyr::glimpse(temp)
 ```
 
-    Rows: 0
-    Columns: 4
-    $ agency_cd <chr> 
-    $ site_no   <chr> 
-    $ dateTime  <dttm> 
-    $ tz_cd     <chr> 
+    Rows: 365
+    Columns: 5
+    $ agency_cd        <chr> "USGS", "USGS", "USGS", "USGS", "USGS", "USGS", "USGS…
+    $ site_no          <chr> "05340500", "05340500", "05340500", "05340500", "0534…
+    $ Date             <date> 2022-10-01, 2022-10-02, 2022-10-03, 2022-10-04, 2022…
+    $ X_00010_00003    <dbl> 13.9, 14.4, 14.9, 15.6, 16.4, 16.4, 15.5, 13.9, 12.6,…
+    $ X_00010_00003_cd <chr> "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A"…
 
 ## Cleaning
 
@@ -165,13 +159,19 @@ flow <- flow |>
     flow_cfs = X_00060_00003,
     qual_code = X_00060_00003_cd
   )
+
+temp <- temp |>
+  dplyr::rename(
+    agency_code = agency_cd,
+    date = Date,
+    temp_c = X_00010_00003,
+    qual_code = X_00010_00003_cd
+  )
 ```
 
 ## Visualization
 
-Lastly, I visualized the data, as the prompt requested. I decided
-against “visualizing” the empty water temperature data with an empty
-plot for the sake of time, though that’s certainly possible to do.
+Lastly, I visualized the data as time series, as the prompt requested.
 
 ``` r
 # In this script I have defaulted to fully qualifying function calls for
@@ -204,4 +204,32 @@ ggplot(data = flow) +
 ```
 
 <img src="README_files/figure-commonmark/visualize-1.png"
+style="width:100.0%" />
+
+``` r
+ggplot(data = temp) +
+  geom_line(aes(x = date, y = temp_c)) +
+  scale_x_date(
+    name = "Date",
+    minor_breaks = "1 month",
+    date_labels = "%b %Y"
+  ) +
+  scale_y_continuous(
+    name = "Mean daily water temperature (°C)",
+    breaks = scales::pretty_breaks(n = 10)
+  ) +
+  labs(
+    title = glue::glue("Mean water temperature: USGS site #{site}"),
+    subtitle = "Water year 2022-2023"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", margin = margin(b = 7.5)),
+    plot.subtitle = element_text(face = "italic", margin = margin(b = 10)),
+    axis.title.x = element_text(face = "bold", margin = margin(t = 10)),
+    axis.title.y = element_text(face = "bold", margin = margin(r = 10))
+  )
+```
+
+<img src="README_files/figure-commonmark/visualize-2.png"
 style="width:100.0%" />
